@@ -7,16 +7,32 @@ import type { TodoState } from './components/TodoItem.vue'
 
 const newTodoTitle = defineModel('newTodo', { type: String, default: "" })
 let todoCounter = ref(0)
-const todos: Ref<TodoState[]> = ref([])
+const uncheckedTodos: Ref<TodoState[]> = ref([])
+const checkedTodos: Ref<TodoState[]> = ref([])
 
 function addTodo() {
   const todo = { title: newTodoTitle.value, checked: false, id: todoCounter.value++ }
-  todos.value = [todo, ...todos.value]
+  uncheckedTodos.value.unshift(todo)
   newTodoTitle.value = ""
 }
 
 function removeTodo(todo: TodoState) {
-  todos.value = todos.value.filter((t) => t.id != todo.id)
+  const filter = (t: TodoState) => t.id != todo.id
+  if (todo.checked) {
+    checkedTodos.value = checkedTodos.value.filter(filter)
+    return
+  }
+  uncheckedTodos.value = uncheckedTodos.value.filter(filter)
+}
+
+function toggleTodo(todo: TodoState) {
+  removeTodo(todo)
+  todo.checked = !todo.checked
+  if (todo.checked) {
+    checkedTodos.value.unshift(todo)
+    return
+  }
+  uncheckedTodos.value.push(todo)
 }
 
 </script>
@@ -37,7 +53,9 @@ function removeTodo(todo: TodoState) {
           </div>
         </form>
         <br>
-        <TodoItem v-for="todo in todos" :key="todo.id" :todo @toggled="todo.checked = !todo.checked"
+        <TodoItem v-for="todo in uncheckedTodos" :key="todo.id" :todo @toggled="toggleTodo(todo)"
+          @removed="removeTodo(todo)" />
+        <TodoItem v-for="todo in checkedTodos" :key="todo.id" :todo @toggled="toggleTodo(todo)"
           @removed="removeTodo(todo)" />
       </div>
     </div>
