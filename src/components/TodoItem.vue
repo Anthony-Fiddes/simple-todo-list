@@ -23,7 +23,8 @@ const cssID = 'task-' + props.todo.id
     <div class="control is-expanded">
       <label class="checkbox" :for="cssID">
         <input :id="cssID" @change="emit('toggled')" :checked="todo.checked" type="checkbox">
-        {{ todo.title }}
+        <s v-if="todo.checked">{{ todo.title }}</s>
+        <span v-else>{{ todo.title }}</span>
       </label>
     </div>
     <div class="control">
