@@ -10,7 +10,8 @@ let todoCounter = ref(0)
 const todos: Ref<TodoState[]> = ref([])
 
 function addTodo() {
-  todos.value.push({ title: newTodoTitle.value, checked: false, id: todoCounter.value++ })
+  const todo = { title: newTodoTitle.value, checked: false, id: todoCounter.value++ }
+  todos.value = [todo, ...todos.value]
   newTodoTitle.value = ""
 }
 
