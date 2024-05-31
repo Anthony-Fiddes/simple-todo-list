@@ -13,6 +13,8 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "bulma": "^1.0.1",
+    "lucide-vue-next": "^0.381.0",
     "vue": "^3.4.21"
   },
   "devDependencies": {

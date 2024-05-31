@@ -18,11 +18,23 @@ function addTodo() {
 
 <template>
   <main>
-    <input v-model="newTodoTitle" placeholder="New Todo">
-    <button @click="addTodo">Add</button>
-    <br>
-    <br>
-    <TodoItem v-for="todo in todos" :key="todo.id" :todo @toggled="todo.checked = !todo.checked" />
+    <div class="columns is-centered">
+      <div class="column is-half is-size-5">
+        <!-- pressing enter will submit the new todo but not reload the page -->
+        <form action="javascript:void(0);">
+          <div class="field has-addons">
+            <div class="control is-expanded">
+              <input class="input" type="text" v-model="newTodoTitle" placeholder="New Todo">
+            </div>
+            <div class="control">
+              <button class="button" @click="addTodo">Add</button>
+            </div>
+          </div>
+        </form>
+        <br>
+        <TodoItem v-for="todo in todos" :key="todo.id" :todo @toggled="todo.checked = !todo.checked" />
+      </div>
+    </div>
   </main>
 </template>
 
