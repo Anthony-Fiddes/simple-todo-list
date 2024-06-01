@@ -1,14 +1,41 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import type { Ref } from 'vue'
 import TodoItem from './components/TodoItem.vue'
 import type { TodoState } from './components/TodoItem.vue'
 
-
-const newTodoTitle = defineModel('newTodo', { type: String, default: "" })
-let todoCounter = ref(0)
+const STORAGE_KEY = "simple-todo-list-store"
+const localStoreStr = localStorage.getItem(STORAGE_KEY)
 const uncheckedTodos: Ref<TodoState[]> = ref([])
 const checkedTodos: Ref<TodoState[]> = ref([])
+let todoCounter = ref(0)
+if (localStoreStr !== null) {
+  const localStore = JSON.parse(localStoreStr)
+  const checked = localStore["checked"]
+  // could be worth doing more validation to make sure that the arrays are
+  // actually properly populated with TodoState objects. But since we're the
+  // only ones writing/reading from this store, it's fine for now.
+  if (checked && Array.isArray(checked)) {
+    checkedTodos.value.push(...localStore["checked"])
+  }
+  const unchecked = localStore["unchecked"]
+  if (unchecked && Array.isArray(unchecked)) {
+    uncheckedTodos.value.push(...localStore["unchecked"])
+  }
+  const checkedIDs = checkedTodos.value.map(x => x.id)
+  const uncheckedIDs = uncheckedTodos.value.map(x => x.id)
+  const maxID = Math.max(...checkedIDs, ...uncheckedIDs)
+  todoCounter.value = maxID + 1
+}
+
+function updateLocalStore() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ checked: checkedTodos.value, unchecked: uncheckedTodos.value }))
+}
+
+watch(uncheckedTodos, updateLocalStore, { deep: true })
+watch(checkedTodos, updateLocalStore, { deep: true })
+
+const newTodoTitle = defineModel('newTodo', { type: String, default: "" })
 
 function addTodo() {
   const todo = { title: newTodoTitle.value, checked: false, id: todoCounter.value++ }
